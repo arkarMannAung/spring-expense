@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mybatis.expense.repository.ExpenseMapper">
+
+	<select id="get" resultType="com.mybatis.expense.entity.MonthlyExpense">
+		SELECT year,month,SUM(expense) total
+		FROM (SELECT
+		EXTRACT('year' FROM date) "year",
+		date_part('month',date) "month",
+		expense
+		FROM expense) e
+		GROUP BY year,month
+		ORDER BY year,month
+	</select>
+
+	<select id="detail" resultType="com.mybatis.expense.entity.Expense">
+		SELECT *
+		FROM expense
+		WHERE
+		EXTRACT('year' FROM date) = #{year}
+		AND
+		date_part('month',date) = #{month}
+	</select>
+	
+	<select id="index" resultType="com.mybatis.expense.entity.Expense">
+		SELECT *
+		FROM expense
+		WHERE id = #{id}
+	</select>
+	
+	<update id="update">
+		UPDATE expense
+		SET
+			date=#{date},
+			expense=#{expense},
+			title=#{title}
+		WHERE id=#{id}
+	</update>
+	
+	<insert id="create">
+		INSERT INTO expense(title,date,expense)
+		VALUES(
+			#{title},
+			#{date},
+			#{expense}
+		)
+	</insert>
+	
+</mapper>
